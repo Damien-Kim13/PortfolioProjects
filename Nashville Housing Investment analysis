@@ -205,6 +205,8 @@ drop column OwnerAddress, TaxDistrict, PropertyAddress
 Alter Table dbo.NashvilleHousing
 drop column SaleDate
 
+
+
 ---------------------------------- Understanding Tennessee RE market, viewing the best places to investors --------------------------
 -- New column, SqFt, using the acreage *43560, was created. Because there was no measurement for sqft of each properties, it was neccessary and was added for RE investment and analysis purposes.
 -- Although not the best figure, SqFt column will be used to get price per sqft of each Real Estate property
