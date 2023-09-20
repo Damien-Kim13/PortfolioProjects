@@ -204,3 +204,69 @@ drop column OwnerAddress, TaxDistrict, PropertyAddress
 
 Alter Table dbo.NashvilleHousing
 drop column SaleDate
+
+---------------------------------- Understanding Tennessee RE market, viewing the best places to investors --------------------------
+-- New column, SqFt, using the acreage *43560, was created. Because there was no measurement for sqft of each properties, it was neccessary and was added for RE investment and analysis purposes.
+-- Although not the best figure, SqFt column will be used to get price per sqft of each Real Estate property
+
+alter table dbo.NashvilleHousing
+add SqFt Int
+
+Update dbo.NashvilleHousing
+Set SqFt = Acreage * 43560;
+
+
+-- Add new column for price per sqft of each properties
+alter table dbo.NashvilleHousing
+add PriceperSqft Float
+
+-- However, with above column pricing per sqft of the Sale Value. It is not accurate, hence needs to be switched to Land value and see worthy investments.
+alter table dbo.NashvilleHousing
+add LandPerSqft Float
+
+-- Finindg values for PricePerSqft & LandPerSqft
+Update dbo.NashvilleHousing
+Set PricePerSqft = SalePrice/SqFt 
+
+Update dbo.NashvilleHousing
+ Set LandPerSqft = LandValue/SqFt
+
+ -- See table after updates
+Select * 
+From dbo.NashvilleHousing
+
+
+--- After looking over the newly added column, some values in TotalValue were greater than SalePrice (TotalValue is the total appraisal value appraised by counties)
+--- This query will show transactions that were sold at its highest sales price at that time
+Select *
+ From dbo.NashvilleHousing
+ Where SalePrice > TotalValue
+
+
+ -- However, for this analysis we need to know which property is undervalued. 
+ -- These are the properties that bring attraction to investors.
+ Select *
+ From dbo.NashvilleHousing
+ Where SalePrice < TotalValue
+
+
+ -- Looking at vacant land/lots to build homes 
+ Select *
+  From dbo.NashvilleHousing
+  Where (SalePrice < TotalValue AND LandUse Like 'VACANT%')
+
+ 
+ -- Looking for vacant commercial lots
+ Select *
+  From dbo.NashvilleHousing
+  Where (SalePrice < TotalValue AND LandUse Like 'COMMERCIAL%')
+
+  -- Looking for Residential builds that had lower SalePrice than TotalValue
+  Select *
+  From dbo.NashvilleHousing
+  Where (SalePrice < TotalValue AND LandUse Like 'RESIDENTIAL%')
+
+-- From above analysis, we can clearly see which residential properties were undervalued.
+-- After the findings, we would physically see the reason for the low sales price, i.e. foreclosure or needs work.
+-- Web scrapping is possible to do but for this specific dataset and being a bit aged, MLS would not have the information needed to deep dive into analysis.
+-- If avaialble, finding ARV, ROI, etc. of these properties is possible.
