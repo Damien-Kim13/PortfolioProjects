@@ -257,11 +257,39 @@ Select *
   From dbo.NashvilleHousing
   Where (SalePrice < TotalValue AND LandUse Like 'VACANT%')
 
+--- Understanding value in LandUse 'Vacant'
+
+Select LandUse, avg(SalePrice) As avg_saleprice, avg(TotalValue) As avg_totalprice, avg(PricePerSqFt) As avg_pricepersqft
+  From dbo.NashvilleHousing
+  Where (SalePrice < TotalValue OR LandUse Like 'VACANT%')
+  group by LandUse
+  Having avg(PricePerSqFt) > 1.5
+  order by avg(SalePrice) desc
+
+--- Avg price sales in data timeline
+
+  Select LandUse, avg(SalePrice) As avg_saleprice, avg(TotalValue) As avg_totalprice, avg(PricePerSqFt) As avg_pricepersqft, SaleDateConverted, SqFt
+  From dbo.NashvilleHousing
+  Where (SalePrice < TotalValue AND LandUse Like 'VACANT%') AND (SaleDateConverted between '2012-01-01' AND '2017-12-31')
+  group by LandUse, SaleDateConverted, SqFt
+  Having avg(PricePerSqFt) >= 10
+  order by SaleDateConverted
+
  
  -- Looking for vacant commercial lots
  Select *
   From dbo.NashvilleHousing
   Where (SalePrice < TotalValue AND LandUse Like 'COMMERCIAL%')
+
+--- Understanding value in LandUse for 'Commercial' And within data timeline
+
+Select LandUse, SalePrice, avg(SalePrice) As avg_saleprice, avg(TotalValue) As avg_totalprice, avg(PricePerSqFt) As avg_pricepersqft, SaleDateConverted, SqFt
+  From dbo.NashvilleHousing
+  Where (SalePrice <> TotalValue AND LandUse Like '%COMMERCIAL%') AND (SaleDateConverted between '2012-01-01' AND '2017-12-31')
+  group by LandUse, SaleDateConverted, SqFt, SalePrice
+  Having avg(SalePrice) > 1 Or avg(SalePrice) Is NULL
+  order by avg(SalePrice) desc
+
 
   -- Looking for Residential builds that had lower SalePrice than TotalValue
   Select *
